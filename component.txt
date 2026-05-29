@@ -1,0 +1,142 @@
+<USER_REQUEST>
+agrega esta secciòn de testimonios a la paginaYou are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+3d-testimonails.tsx
+import React, { ComponentPropsWithoutRef, useRef } from 'react';
+import { cn } from '@/lib/utils';
+
+interface MarqueeProps extends ComponentPropsWithoutRef<'div'> {
+  /**
+   * Optional CSS class name to apply custom styles
+   */
+  className?: string;
+  /**
+   * Whether to reverse the animation direction
+   * @default false
+   */
+  reverse?: boolean;
+  /**
+   * Whether to pause the animation on hover
+   * @default false
+   */
+  pauseOnHover?: boolean;
+  /**
+   * Content to be displayed in the marquee
+   */
+  children: React.ReactNode;
+  /**
+   * Whether to animate vertically instead of horizontally
+   * @default false
+   */
+  vertical?: boolean;
+  /**
+   * Number of times to repeat the content
+   * @default 4
+   */
+  repeat?: number;
+  /**
+   * If true, automatically repeats children enough to fill the visible area
+   */
+  autoFill?: boolean;
+  /**
+   * ARIA label for accessibility
+   */
+  ariaLabel?: string;
+  /**
+   * ARIA live region politeness
+   */
+  ariaLive?: 'off' | 'polite' | 'assertive';
+  /**
+   * ARIA role
+   */
+  ariaRole?: string;
+}
+
+export function Marquee({
+  className,
+  reverse = false,
+  pauseOnHover = false,
+  children,
+  vertical = false,
+  repeat = 4,
+  ariaLabel,
+  ariaLive = 'off',
+  ariaRole = 'marquee',
+  ...props
+}: MarqueeProps) {
+  const marqueeRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div
+      {...props}
+      ref={marqueeRef}
+      data-slot="marquee"
+      className={cn(
+        'group flex o
+<truncated 9780 bytes>
+ration) linear infinite;
+}
+
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
+
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-05-29T07:58:58-05:00.
+
+The user's current state is as follows:
+Other open documents:
+- c:\Users\Usuario\Desktop\dashboard-misiones\.env.local (LANGUAGE_UNSPECIFIED)
+- c:\Users\Usuario\Desktop\dashboard-misiones\src\app\api\admin\reminders\send\route.ts (LANGUAGE_TYPESCRIPT)
+- c:\Users\Usuario\Desktop\dashboard-misiones\src\app\admin\users\page.tsx (LANGUAGE_TSX)
+- c:\Users\Usuario\Desktop\dashboard-misiones\src\app\admin\missions\new\page.tsx (LANGUAGE_TSX)
+- c:\Users\Usuario\Desktop\dashboard-misiones\supabase\migrations\20260527225849_add_last_reminded_at.sql (LANGUAGE_SQL)
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from Gemini 3.5 Flash (High) to Gemini 3.1 Pro (High). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>

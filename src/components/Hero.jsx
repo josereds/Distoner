@@ -56,26 +56,7 @@ export default function Hero({ onNavigate }) {
         maxWidth: '850px',
         padding: '0 20px'
       }}>
-        {/* Subtle glowing badge */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '8px',
-          background: 'rgba(37, 99, 235, 0.08)',
-          border: '1px solid rgba(37, 99, 235, 0.3)',
-          padding: '8px 16px',
-          borderRadius: '30px',
-          color: 'var(--primary)',
-          fontSize: '14px',
-          fontWeight: '600',
-          letterSpacing: '0.05em',
-          textTransform: 'uppercase',
-          marginBottom: '28px',
-          boxShadow: 'var(--shadow-neon-primary)',
-          animation: 'float 3s ease-in-out infinite'
-        }}>
-          <Printer size={16} /> Especialistas en Impresión & Copiado
-        </div>
+
 
         <h1 style={{
           fontSize: 'clamp(36px, 7vw, 68px)',

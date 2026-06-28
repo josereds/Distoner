@@ -1,92 +1,148 @@
-import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, Send, Trash2, X, AlertCircle } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle,
+  Clock,
+  CreditCard,
+  Minus,
+  PackageSearch,
+  Plus,
+  Search,
+  Send,
+  ShieldCheck,
+  ShoppingCart,
+  Store,
+  Trash2,
+  X
+} from 'lucide-react';
+import ProductDetailModal from './ProductDetailModal';
 
-// Product SVGs for high impact visuals with a sober corporate color palette
-function ProductIllustration({ category, color }) {
-  const strokeColor = color || 'var(--primary)';
-  
-  if (category === 'printer-toner') {
-    return (
-      <svg width="100%" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ margin: '0 auto' }}>
-        <rect x="25" y="45" width="70" height="32" rx="4" fill="var(--bg-panel)" stroke={strokeColor} strokeWidth="2.5"/>
-        <rect x="15" y="53" width="10" height="16" rx="2" fill="var(--accent)"/>
-        <rect x="95" y="53" width="10" height="16" rx="2" fill="var(--accent)"/>
-        <line x1="35" y1="53" x2="85" y2="53" stroke="rgba(255,255,255,0.2)" strokeWidth="2"/>
-        <line x1="35" y1="60" x2="85" y2="60" stroke="rgba(255,255,255,0.2)" strokeWidth="2"/>
-        <circle cx="60" cy="61" r="8" stroke={strokeColor} strokeWidth="2" fill="rgba(0,0,0,0.3)"/>
-        <path d="M40 38H80M48 30H72" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round"/>
-      </svg>
-    );
-  }
-  
-  if (category === 'copier-toner') {
-    return (
-      <svg width="100%" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ margin: '0 auto' }}>
-        <path d="M40 30C40 25 45 20 50 20H70C75 20 80 25 80 30V40H40V30Z" fill="var(--bg-panel)" stroke="rgba(255,255,255,0.3)" strokeWidth="2"/>
-        <rect x="35" y="40" width="50" height="60" rx="6" fill="var(--bg-panel)" stroke={strokeColor} strokeWidth="2.5"/>
-        <line x1="35" y1="52" x2="85" y2="52" stroke="var(--primary)" strokeWidth="3"/>
-        <line x1="45" y1="65" x2="75" y2="65" stroke="rgba(255,255,255,0.15)" strokeWidth="2"/>
-        <line x1="45" y1="72" x2="75" y2="72" stroke="rgba(255,255,255,0.15)" strokeWidth="2"/>
-        <line x1="45" y1="79" x2="75" y2="79" stroke="rgba(255,255,255,0.15)" strokeWidth="2"/>
-        <rect x="52" y="86" width="16" height="8" rx="1" fill={strokeColor} opacity="0.8"/>
-      </svg>
-    );
-  }
+const CATEGORIES = [
+  { id: 'all', label: 'Todo el catálogo' },
+  { id: 'toner', label: 'Tóneres compatibles' },
+  { id: 'ink-cartridge', label: 'Cartuchos de tinta' },
+  { id: 'ink-bottle', label: 'Botellas de recarga' }
+];
 
-  if (category === 'refill') {
-    return (
-      <svg width="100%" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ margin: '0 auto' }}>
-        <path d="M45 40H75V55L90 75V90H30V75L45 55V40Z" fill="var(--bg-panel)" stroke={strokeColor} strokeWidth="2.5"/>
-        <path d="M50 20H70V40H50V20Z" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.3)" strokeWidth="2"/>
-        <circle cx="60" cy="75" r="10" stroke="var(--accent)" strokeWidth="2" strokeDasharray="3 3"/>
-        <path d="M40 82C40 82 50 85 60 85C70 85 80 82 80 82" stroke="rgba(255,255,255,0.3)" strokeWidth="2"/>
-      </svg>
-    );
+const CATEGORY_LABELS = {
+  toner: 'Tóner compatible',
+  'ink-cartridge': 'Cartucho de tinta',
+  'ink-bottle': 'Botella de recarga'
+};
+
+const COLOR_HEX = {
+  Cian: '#06b6d4',
+  Magenta: '#db2777',
+  Amarillo: '#eab308',
+  Negro: '#334155'
+};
+
+function loadSavedCart() {
+  const savedCart = localStorage.getItem('distoner_cart');
+  if (!savedCart) return [];
+
+  try {
+    const parsed = JSON.parse(savedCart);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    localStorage.removeItem('distoner_cart');
+    return [];
   }
-  
-  if (category === 'parts') {
+}
+
+function productIdFromLocation() {
+  if (!window.location.hash.startsWith('#producto=')) return null;
+  return decodeURIComponent(window.location.hash.slice('#producto='.length));
+}
+
+function ProductImage({ product, compact = false }) {
+  const [failedImage, setFailedImage] = useState(null);
+  const hasFailed = failedImage === product.image;
+
+  if (!product.image || hasFailed) {
     return (
-      <svg width="100%" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ margin: '0 auto' }}>
-        {/* OPC Cylinder */}
-        <rect x="25" y="35" width="70" height="15" rx="7.5" fill="rgba(37, 99, 235, 0.1)" stroke="var(--primary)" strokeWidth="2.5"/>
-        <line x1="30" y1="42.5" x2="90" y2="42.5" stroke="rgba(255, 255, 255, 0.4)" strokeWidth="1.5"/>
-        {/* Microchip */}
-        <rect x="40" y="65" width="40" height="30" rx="3" fill="var(--bg-panel)" stroke="var(--accent)" strokeWidth="2"/>
-        <circle cx="60" cy="80" r="5" fill="var(--secondary)"/>
-        <line x1="35" y1="72" x2="40" y2="72" stroke="var(--accent)" strokeWidth="2"/>
-        <line x1="35" y1="80" x2="40" y2="80" stroke="var(--accent)" strokeWidth="2"/>
-        <line x1="35" y1="88" x2="40" y2="88" stroke="var(--accent)" strokeWidth="2"/>
-        <line x1="80" y1="72" x2="85" y2="72" stroke="var(--accent)" strokeWidth="2"/>
-        <line x1="80" y1="80" x2="85" y2="80" stroke="var(--accent)" strokeWidth="2"/>
-        <line x1="80" y1="88" x2="85" y2="88" stroke="var(--accent)" strokeWidth="2"/>
-      </svg>
+      <div className={`market-product-fallback ${compact ? 'compact' : ''}`}>
+        <PackageSearch size={compact ? 30 : 48} aria-hidden="true" />
+        <strong translate="no">{product.reference}</strong>
+      </div>
     );
   }
 
   return (
-    <svg width="100%" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ margin: '0 auto' }}>
-      <rect x="30" y="30" width="60" height="60" rx="10" fill="var(--bg-panel)" stroke={strokeColor} strokeWidth="2"/>
-      <circle cx="60" cy="60" r="15" stroke="var(--accent)" strokeWidth="2"/>
-    </svg>
+    <img
+      src={product.image}
+      alt={compact ? '' : `${product.name}, referencia ${product.reference}`}
+      width={compact ? 120 : 560}
+      height={compact ? 120 : 420}
+      loading="lazy"
+      onError={() => setFailedImage(product.image)}
+    />
   );
 }
 
 export default function Products({ products = [] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(loadSavedCart);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [addedRecently, setAddedRecently] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState(productIdFromLocation);
 
   useEffect(() => {
-    const savedCart = localStorage.getItem('distoner_cart');
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error('Error parsing cart');
-      }
-    }
+    const syncProductFromUrl = () => setSelectedProductId(productIdFromLocation());
+    window.addEventListener('hashchange', syncProductFromUrl);
+    window.addEventListener('popstate', syncProductFromUrl);
+    return () => {
+      window.removeEventListener('hashchange', syncProductFromUrl);
+      window.removeEventListener('popstate', syncProductFromUrl);
+    };
   }, []);
+
+  useEffect(() => {
+    if (!isCartOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') setIsCartOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isCartOpen]);
+
+  const selectedProduct = products.find((product) => product.id === selectedProductId) || null;
+
+  const relatedProducts = useMemo(() => {
+    if (!selectedProduct) return [];
+    const sameCategory = products.filter(
+      (product) => product.id !== selectedProduct.id && product.category === selectedProduct.category
+    );
+    const remaining = products.filter(
+      (product) => product.id !== selectedProduct.id && product.category !== selectedProduct.category
+    );
+    return [...sameCategory, ...remaining].slice(0, 3);
+  }, [products, selectedProduct]);
+
+  const filteredProducts = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLocaleLowerCase('es');
+    return products.filter((product) => {
+      const searchableText = [
+        product.name,
+        product.description,
+        product.reference,
+        product.brand,
+        product.color
+      ].filter(Boolean).join(' ').toLocaleLowerCase('es');
+      const matchesSearch = !normalizedSearch || searchableText.includes(normalizedSearch);
+      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchTerm, selectedCategory]);
 
   const saveCart = (newCart) => {
     setCart(newCart);
@@ -94,515 +150,299 @@ export default function Products({ products = [] }) {
   };
 
   const addToCart = (product) => {
-    const existing = cart.find(item => item.id === product.id);
-    if (existing) {
-      const updated = cart.map(item =>
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-      );
-      saveCart(updated);
-    } else {
-      saveCart([...cart, { ...product, quantity: 1 }]);
-    }
-    setIsCartOpen(true);
+    const existing = cart.find((item) => item.id === product.id);
+    if (!existing) saveCart([...cart, { ...product, quantity: 1 }]);
+
+    setAddedRecently(product.id);
+    window.setTimeout(() => setAddedRecently(null), 1400);
   };
 
   const updateQuantity = (productId, change) => {
-    const updated = cart.map(item => {
-      if (item.id === productId) {
-        const qty = item.quantity + change;
-        return qty > 0 ? { ...item, quantity: qty } : null;
-      }
-      return item;
+    const updated = cart.map((item) => {
+      if (item.id !== productId) return item;
+      const quantity = Math.min(item.quantity + change, item.stock);
+      return quantity > 0 ? { ...item, quantity } : null;
     }).filter(Boolean);
     saveCart(updated);
   };
 
-  const removeFromCart = (productId) => {
-    const updated = cart.filter(item => item.id !== productId);
-    saveCart(updated);
-  };
+  const removeFromCart = (productId) => saveCart(cart.filter((item) => item.id !== productId));
 
-  const clearCart = () => {
-    saveCart([]);
-  };
+  const openProduct = useCallback((product) => {
+    window.history.pushState(null, '', `#producto=${encodeURIComponent(product.id)}`);
+    setSelectedProductId(product.id);
+  }, []);
+
+  const closeProduct = useCallback(() => {
+    window.history.replaceState(null, '', '#productos');
+    setSelectedProductId(null);
+  }, []);
 
   const checkoutWhatsApp = () => {
     if (cart.length === 0) return;
 
-    let message = 'Hola Distoner, me gustaría solicitar una cotización por los siguientes productos:\n\n';
-    let total = 0;
+    const lines = cart.map(
+      (item) => `• ${item.name} · Ref. ${item.reference} (${item.quantity} und.)`
+    );
+    const message = [
+      'Hola Distoner, quisiera solicitar una cotización para:',
+      '',
+      ...lines,
+      '',
+      'Por favor confirmar precios y disponibilidad. Gracias.'
+    ].join('\n');
 
-    cart.forEach(item => {
-      message += `• ${item.name} (${item.quantity} und.) - $${(item.price * item.quantity).toLocaleString()} COP\n`;
-      total += item.price * item.quantity;
-    });
-
-    message += `\n*Total Estimado:* $${total.toLocaleString()} COP\n\nQuedo atento a su respuesta para concretar la entrega.`;
-    
     const recentSales = localStorage.getItem('distoner_sales');
     let sales = [];
     if (recentSales) {
-      try { sales = JSON.parse(recentSales); } catch(e) {}
+      try {
+        sales = JSON.parse(recentSales);
+      } catch {
+        sales = [];
+      }
     }
-    const newSale = {
-      id: 'D-' + Math.floor(Math.random() * 9000 + 1000),
+
+    sales.unshift({
+      id: `D-${Math.floor(Math.random() * 9000 + 1000)}`,
       client: 'Cotización Web (WhatsApp)',
       date: new Date().toISOString().split('T')[0],
-      total: total,
-      products: cart.map(item => `${item.name} (x${item.quantity})`).join(', '),
+      total: 0,
+      products: cart.map((item) => `${item.name} (x${item.quantity})`).join(', '),
       status: 'Pendiente'
-    };
-    sales.unshift(newSale);
+    });
     localStorage.setItem('distoner_sales', JSON.stringify(sales));
 
-    const whatsappUrl = `https://wa.me/573115174372?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-    clearCart();
+    window.open(`https://wa.me/573115174372?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    saveCart([]);
     setIsCartOpen(false);
   };
 
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          product.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const categories = [
-    { id: 'all', label: 'Todos' },
-    { id: 'printer-toner', label: 'Tóner Impresoras' },
-    { id: 'copier-toner', label: 'Tóner Copiadoras' },
-    { id: 'refill', label: 'Recargas' },
-    { id: 'parts', label: 'Repuestos y Chips' }
-  ];
-
   return (
-    <section id="productos" style={{ padding: '100px 0', background: 'var(--bg-dark)' }}>
+    <section id="productos" className="catalog-section" aria-labelledby="catalog-title">
       <div className="container">
-        <h2 className="section-title">Productos y Suministros</h2>
-        <p className="section-desc">
-          Contamos con tóners originales y compatibles de alto rendimiento, recargas de tóner con chip y repuestos específicos. Añade productos para cotizarlos directo por WhatsApp.
-        </p>
-
-        {/* Search and Filters Header */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px',
-          marginBottom: '40px',
-          alignItems: 'center'
-        }}>
-          <div style={{
-            position: 'relative',
-            width: '100%',
-            maxWidth: '500px'
-          }}>
-            <Search size={18} style={{
-              position: 'absolute',
-              left: '16px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: 'var(--text-muted)'
-            }} />
-            <input
-              type="text"
-              placeholder="Buscar tóner, chips, repuestos..."
-              className="form-input"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                paddingLeft: '48px',
-                borderRadius: '30px'
-              }}
-            />
+        <div className="catalog-hero">
+          <div className="catalog-heading">
+            <span className="catalog-kicker"><Store size={15} aria-hidden="true" /> Tienda Distoner</span>
+            <h2 id="catalog-title">Encuentre la referencia exacta para su impresora</h2>
+            <p>
+              Catálogo actualizado con {products.length} productos disponibles. Compare referencias, revise cada ficha y solicite su cotización directamente.
+            </p>
           </div>
 
-          <div style={{
-            display: 'flex',
-            gap: '10px',
-            flexWrap: 'wrap',
-            justifyContent: 'center'
-          }}>
-            {categories.map(cat => (
+          <div className="catalog-facts" aria-label="Resumen del catálogo">
+            <div><strong>{products.length}</strong><span>referencias</span></div>
+            <div><strong>3</strong><span>categorías</span></div>
+            <div><strong>&lt; 2 h</strong><span>respuesta</span></div>
+          </div>
+        </div>
+
+        <div className="catalog-marketplace">
+          <div className="catalog-toolbar">
+            <div className="catalog-search-wrap">
+              <label className="sr-only" htmlFor="catalog-search">Buscar en el catálogo</label>
+              <Search size={19} aria-hidden="true" />
+              <input
+                id="catalog-search"
+                name="catalog-search"
+                type="search"
+                autoComplete="off"
+                placeholder="Buscar por modelo, referencia o color…"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </div>
+
+            <div className="catalog-result-count" aria-live="polite">
+              <strong>{filteredProducts.length}</strong> resultados
+            </div>
+          </div>
+
+          <div className="catalog-category-tabs" aria-label="Filtrar productos por categoría">
+            {CATEGORIES.map((category) => (
               <button
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.id)}
-                className={`btn ${selectedCategory === cat.id ? 'btn-primary' : 'btn-secondary'}`}
-                style={{
-                  padding: '8px 20px',
-                  fontSize: '14px',
-                  borderRadius: '20px'
-                }}
+                key={category.id}
+                type="button"
+                className={selectedCategory === category.id ? 'active' : ''}
+                onClick={() => setSelectedCategory(category.id)}
+                aria-pressed={selectedCategory === category.id}
               >
-                {cat.label}
+                {category.label}
+                <span>
+                  {category.id === 'all'
+                    ? products.length
+                    : products.filter((product) => product.category === category.id).length}
+                </span>
               </button>
             ))}
           </div>
-        </div>
 
-        {/* Products Grid */}
-        {filteredProducts.length === 0 ? (
-          <div style={{
-            textAlign: 'center',
-            padding: '40px',
-            border: '1px dashed var(--border-color)',
-            borderRadius: '16px',
-            color: 'var(--text-muted)'
-          }}>
-            <AlertCircle size={40} style={{ color: 'var(--accent)', marginBottom: '12px' }} />
-            <p>No encontramos productos en esta categoría que coincidan con tu búsqueda.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-4">
-            {filteredProducts.map(product => {
-              const isLowStock = product.stock <= 3;
-              const hasNoStock = product.stock <= 0;
-              
-              const colorMap = {
-                'printer-toner': 'var(--primary)',
-                'copier-toner': 'var(--accent)',
-                'refill': 'var(--secondary)',
-                'parts': 'var(--text-white)'
-              };
-              const accentColor = colorMap[product.category] || 'var(--primary)';
-
-              return (
-                <div key={product.id} className="card" style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  height: '100%',
-                  padding: '20px',
-                  textAlign: 'left'
-                }}>
-                  <div>
-                    <div style={{
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      marginBottom: '16px',
-                      border: '1px solid rgba(255, 255, 255, 0.04)',
-                      textAlign: 'center'
-                    }}>
-                      <ProductIllustration category={product.category} color={accentColor} />
-                    </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span className="badge" style={{
-                        fontSize: '10px',
-                        padding: '2px 8px',
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        color: 'rgba(255, 255, 255, 0.6)'
-                      }}>
-                        {categories.find(c => c.id === product.category)?.label}
-                      </span>
-                      {hasNoStock ? (
-                        <span style={{ fontSize: '11px', color: 'var(--danger)', fontWeight: '600' }}>Sin stock</span>
-                      ) : isLowStock ? (
-                        <span style={{ fontSize: '11px', color: 'var(--warning)', fontWeight: '600' }}>¡Últimas unidades! ({product.stock})</span>
-                      ) : (
-                        <span style={{ fontSize: '11px', color: 'var(--success)', fontWeight: '500' }}>Disponible ({product.stock})</span>
-                      )}
-                    </div>
-
-                    <h3 style={{
-                      fontSize: '17px',
-                      fontWeight: '700',
-                      marginBottom: '8px',
-                      lineHeight: '1.2',
-                      color: 'var(--text-white)'
-                    }}>
-                      {product.name}
-                    </h3>
-                    
-                    <p style={{
-                      fontSize: '13px',
-                      color: 'var(--text-muted)',
-                      marginBottom: '16px',
-                      display: '-webkit-box',
-                      WebkitLineClamp: '2',
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      height: '38px'
-                    }}>
-                      {product.description}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      marginTop: '10px'
-                    }}>
-                      <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '10px', color: 'var(--text-muted)', textTransform: 'uppercase' }}>Precio unitario</span>
-                        <span style={{ fontSize: '19px', fontWeight: '800', color: 'var(--primary)' }}>
-                          ${product.price.toLocaleString()} <span style={{ fontSize: '10px', fontWeight: '500', color: 'rgba(255,255,255,0.5)' }}>COP</span>
-                        </span>
-                      </div>
-                      
-                      <button
-                        onClick={() => addToCart(product)}
-                        disabled={hasNoStock}
-                        className="btn btn-primary"
-                        style={{
-                          padding: '10px',
-                          borderRadius: '50%',
-                          minWidth: '40px',
-                          height: '40px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          opacity: hasNoStock ? '0.5' : '1',
-                          cursor: hasNoStock ? 'not-allowed' : 'pointer'
-                        }}
-                      >
-                        <ShoppingCart size={18} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* Floating Cart Button */}
-      {cart.length > 0 && (
-        <button
-          onClick={() => setIsCartOpen(true)}
-          style={{
-            position: 'fixed',
-            bottom: '105px',
-            right: '30px',
-            background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-            color: 'white',
-            border: 'none',
-            outline: 'none',
-            borderRadius: '50%',
-            width: '60px',
-            height: '60px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 10px 25px rgba(37, 99, 235, 0.4)',
-            cursor: 'pointer',
-            zIndex: 999,
-            transition: 'var(--transition)'
-          }}
-          className="cart-floating-btn"
-        >
-          <div style={{ position: 'relative' }}>
-            <ShoppingCart size={24} />
-            <span style={{
-              position: 'absolute',
-              top: '-12px',
-              right: '-12px',
-              background: 'var(--warning)',
-              color: '#000',
-              fontWeight: '800',
-              fontSize: '11px',
-              borderRadius: '50%',
-              width: '20px',
-              height: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '2px solid var(--bg-dark)'
-            }}>
-              {cart.reduce((sum, item) => sum + item.quantity, 0)}
-            </span>
-          </div>
-        </button>
-      )}
-
-      {/* Side Cart Drawer */}
-      {isCartOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          right: 0,
-          width: '100%',
-          maxWidth: '420px',
-          height: '100vh',
-          background: 'var(--bg-panel)',
-          borderLeft: '1px solid var(--border-color)',
-          boxShadow: '-10px 0 30px rgba(0,0,0,0.5)',
-          zIndex: 1100,
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '24px'
-        }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: '24px',
-            borderBottom: '1px solid var(--border-color)',
-            paddingBottom: '16px'
-          }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '20px' }}>
-              <ShoppingCart size={22} style={{ color: 'var(--primary)' }} /> Mi Cotización
-            </h3>
-            <button
-              onClick={() => setIsCartOpen(false)}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer'
-              }}
-            >
-              <X size={24} />
-            </button>
+          <div className="sr-only" aria-live="polite">
+            {addedRecently
+              ? `${products.find((product) => product.id === addedRecently)?.name} añadido a la cotización.`
+              : ''}
           </div>
 
-          {cart.length === 0 ? (
-            <div style={{
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              color: 'var(--text-muted)',
-              gap: '16px'
-            }}>
-              <ShoppingCart size={48} opacity="0.3" />
-              <p>Tu cotización está vacía.</p>
+          {filteredProducts.length === 0 ? (
+            <div className="catalog-empty-state">
+              <AlertCircle size={44} aria-hidden="true" />
+              <h3>No encontramos esa referencia</h3>
+              <p>Revise la escritura o explore otra categoría.</p>
               <button
-                onClick={() => setIsCartOpen(false)}
+                type="button"
                 className="btn btn-secondary"
-                style={{ padding: '8px 20px', fontSize: '13px' }}
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedCategory('all');
+                }}
               >
-                Volver al catálogo
+                Ver todo el catálogo
               </button>
             </div>
           ) : (
-            <>
-              <div style={{
-                flex: 1,
-                overflowY: 'auto',
-                paddingRight: '4px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px'
-              }}>
-                {cart.map(item => (
-                  <div key={item.id} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    background: 'rgba(255,255,255,0.02)',
-                    border: '1px solid var(--border-color)',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    gap: '12px'
-                  }}>
-                    <div style={{ flex: 1 }}>
-                      <h4 style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-white)', marginBottom: '4px' }}>
-                        {item.name}
-                      </h4>
-                      <span style={{ fontSize: '13px', color: 'var(--primary)', fontWeight: '700' }}>
-                        ${(item.price * item.quantity).toLocaleString()} COP
-                      </span>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <button
-                        onClick={() => updateQuantity(item.id, -1)}
-                        style={{
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          color: '#fff',
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        -
-                      </button>
-                      <span style={{ fontSize: '14px', fontWeight: '700', width: '20px', textAlign: 'center' }}>
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.id, 1)}
-                        style={{
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          color: '#fff',
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        +
-                      </button>
-                    </div>
-
+            <div className="market-product-grid">
+              {filteredProducts.map((product) => {
+                const isInCart = cart.some((item) => item.id === product.id);
+                const justAdded = addedRecently === product.id;
+                return (
+                  <article key={product.id} className="market-product-card">
                     <button
-                      onClick={() => removeFromCart(item.id)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'rgba(239, 68, 68, 0.7)',
-                        cursor: 'pointer'
-                      }}
+                      type="button"
+                      className="market-product-open"
+                      onClick={() => openProduct(product)}
+                      aria-label={`Ver detalles de ${product.name}`}
                     >
-                      <Trash2 size={16} />
+                      <div className="market-product-media">
+                        <ProductImage product={product} />
+                        <span className="market-stock-badge"><span className="stock-dot" /> Disponible</span>
+                        <span className="market-item-number">N.º {product.inventoryNumber}</span>
+                      </div>
+
+                      <div className="market-product-body">
+                        <div className="market-product-meta">
+                          <span>{CATEGORY_LABELS[product.category]}</span>
+                          <span className="market-color">
+                            <i style={{ backgroundColor: COLOR_HEX[product.color] || '#64748b' }} />
+                            {product.color}
+                          </span>
+                        </div>
+                        <h3>{product.name}</h3>
+                        <p className="market-reference" translate="no">{product.reference}</p>
+                        <span className="market-view-link">Ver producto <ArrowRight size={15} aria-hidden="true" /></span>
+                      </div>
                     </button>
-                  </div>
-                ))}
-              </div>
 
-              <div style={{
-                borderTop: '1px solid var(--border-color)',
-                paddingTop: '20px',
-                marginTop: '16px'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '20px'
-                }}>
-                  <span style={{ color: 'var(--text-muted)', fontSize: '15px' }}>Total Estimado:</span>
-                  <span style={{ fontSize: '22px', fontWeight: '800', color: 'var(--primary)' }}>
-                    ${cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()} <span style={{ fontSize: '12px' }}>COP</span>
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <button
-                    onClick={checkoutWhatsApp}
-                    className="btn btn-whatsapp"
-                    style={{ width: '100%', padding: '14px', borderRadius: '8px' }}
-                  >
-                    <Send size={18} /> Enviar Pedido a WhatsApp
-                  </button>
-                  <button
-                    onClick={clearCart}
-                    className="btn btn-secondary"
-                    style={{ width: '100%', padding: '10px', fontSize: '13px', borderRadius: '8px' }}
-                  >
-                    Vaciar Lista
-                  </button>
-                </div>
-              </div>
-            </>
+                    <div className="market-product-footer">
+                      <div>
+                        <span>Precio</span>
+                        <strong>Por confirmar</strong>
+                      </div>
+                      <button
+                        type="button"
+                        className={isInCart || justAdded ? 'market-add-button added' : 'market-add-button'}
+                        onClick={() => addToCart(product)}
+                        disabled={isInCart || product.stock <= 0}
+                        aria-label={isInCart ? `${product.name} ya está en la cotización` : `Agregar ${product.name} a la cotización`}
+                      >
+                        {isInCart || justAdded ? <CheckCircle size={19} aria-hidden="true" /> : <Plus size={21} aria-hidden="true" />}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           )}
         </div>
+      </div>
+
+      {cart.length > 0 && (
+        <button
+          type="button"
+          className="floating-cart-button"
+          onClick={() => setIsCartOpen(true)}
+          aria-label={`Abrir cotización con ${cart.length} productos`}
+        >
+          <ShoppingCart size={23} aria-hidden="true" />
+          <span>{cart.length}</span>
+        </button>
+      )}
+
+      {isCartOpen && (
+        <>
+          <button
+            type="button"
+            className="cart-overlay"
+            onClick={() => setIsCartOpen(false)}
+            aria-label="Cerrar cotización"
+          />
+          <aside className="cart-drawer" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+            <div className="cart-drawer-header">
+              <div>
+                <span>Solicitud de compra</span>
+                <h2 id="cart-title">Su cotización</h2>
+              </div>
+              <button type="button" className="icon-button" onClick={() => setIsCartOpen(false)} aria-label="Cerrar cotización">
+                <X size={20} aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="cart-drawer-items">
+              {cart.map((item) => (
+                <article key={item.id} className="cart-line-item">
+                  <ProductImage product={item} compact />
+                  <div className="cart-line-copy">
+                    <strong>{item.name}</strong>
+                    <span translate="no">{item.reference}</span>
+                    <small>Precio por confirmar</small>
+                  </div>
+                  <div className="cart-line-actions">
+                    <div className="quantity-control" aria-label={`Cantidad de ${item.name}`}>
+                      <button type="button" onClick={() => updateQuantity(item.id, -1)} aria-label={`Quitar ${item.name}`}>
+                        <Minus size={13} aria-hidden="true" />
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(item.id, 1)}
+                        disabled={item.quantity >= item.stock}
+                        aria-label={`Agregar otra unidad de ${item.name}`}
+                      >
+                        <Plus size={13} aria-hidden="true" />
+                      </button>
+                    </div>
+                    <button type="button" className="remove-cart-item" onClick={() => removeFromCart(item.id)} aria-label={`Eliminar ${item.name}`}>
+                      <Trash2 size={16} aria-hidden="true" />
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="cart-trust-row">
+              <span><ShieldCheck size={15} aria-hidden="true" /> Garantía</span>
+              <span><Clock size={15} aria-hidden="true" /> Respuesta &lt; 2 h</span>
+              <span><CreditCard size={15} aria-hidden="true" /> Pago acordado</span>
+            </div>
+
+            <div className="cart-drawer-footer">
+              <p><span>Precio final</span><strong>Por confirmar</strong></p>
+              <button type="button" className="btn btn-whatsapp" onClick={checkoutWhatsApp}>
+                <Send size={18} aria-hidden="true" /> Solicitar cotización por WhatsApp
+              </button>
+              <button type="button" className="cart-clear-button" onClick={() => saveCart([])}>Vaciar cotización</button>
+            </div>
+          </aside>
+        </>
+      )}
+
+      {selectedProduct && (
+        <ProductDetailModal
+          product={selectedProduct}
+          relatedProducts={relatedProducts}
+          onClose={closeProduct}
+          onSelectRelated={openProduct}
+          onAddToCart={addToCart}
+          isInCart={cart.some((item) => item.id === selectedProduct.id)}
+        />
       )}
     </section>
   );

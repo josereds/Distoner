@@ -1,11 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { 
+import { useState } from 'react';
+import {
   TrendingUp, Package, AlertTriangle, Plus, Edit2, Trash2, 
   Check, X, LogOut, DollarSign, List, ShoppingBag 
 } from 'lucide-react';
 
+const CATEGORY_LABELS = {
+  toner: 'Tóner compatible',
+  'ink-cartridge': 'Cartucho de tinta',
+  'ink-bottle': 'Botella de recarga'
+};
+
+const formatProductPrice = (price) =>
+  Number.isFinite(price) && price > 0 ? `$${price.toLocaleString()} COP` : 'Por confirmar';
+
+const INITIAL_SALES = [
+  { id: 'D-9812', client: 'Carlos Mendoza', date: '2026-05-28', total: 130000, products: 'Tóner HP CF283A (x2)', status: 'Completado' },
+  { id: 'D-4821', client: 'Sistemas Bogotá', date: '2026-05-27', total: 60000, products: 'Mantenimiento Preventivo (x1)', status: 'Completado' },
+  { id: 'D-3810', client: 'Andrea Ruíz', date: '2026-05-25', total: 45000, products: 'Recarga de Tóner Color (x1)', status: 'Pendiente' }
+];
+
+function loadSales() {
+  const savedSales = localStorage.getItem('distoner_sales');
+  if (savedSales) {
+    try {
+      const parsed = JSON.parse(savedSales);
+      if (Array.isArray(parsed)) return parsed;
+    } catch {
+      // Invalid browser data is replaced below.
+    }
+  }
+
+  localStorage.setItem('distoner_sales', JSON.stringify(INITIAL_SALES));
+  return INITIAL_SALES;
+}
+
 export default function AdminDashboard({ products, setProducts, onNavigate }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => sessionStorage.getItem('distoner_admin_auth') === 'true'
+  );
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   
@@ -18,38 +50,14 @@ export default function AdminDashboard({ products, setProducts, onNavigate }) {
     id: '',
     name: '',
     description: '',
-    category: 'printer-toner',
+    category: 'toner',
     price: '',
     stock: ''
   });
 
   // Sales state
-  const [sales, setSales] = useState([]);
+  const [sales, setSales] = useState(loadSales);
   const [newSale, setNewSale] = useState({ client: '', products: '', total: '', status: 'Completado' });
-
-  // Load auth state and sales on mount
-  useEffect(() => {
-    const isAuth = sessionStorage.getItem('distoner_admin_auth') === 'true';
-    setIsAuthenticated(isAuth);
-
-    const savedSales = localStorage.getItem('distoner_sales');
-    if (savedSales) {
-      try {
-        setSales(JSON.parse(savedSales));
-      } catch (e) {
-        console.error('Error parsing sales');
-      }
-    } else {
-      // Mock initial sales
-      const initialSales = [
-        { id: 'D-9812', client: 'Carlos Mendoza', date: '2026-05-28', total: 130000, products: 'Tóner HP CF283A (x2)', status: 'Completado' },
-        { id: 'D-4821', client: 'Sistemas Bogotá', date: '2026-05-27', total: 60000, products: 'Mantenimiento Preventivo (x1)', status: 'Completado' },
-        { id: 'D-3810', client: 'Andrea Ruíz', date: '2026-05-25', total: 45000, products: 'Recarga de Tóner Color (x1)', status: 'Pendiente' }
-      ];
-      setSales(initialSales);
-      localStorage.setItem('distoner_sales', JSON.stringify(initialSales));
-    }
-  }, []);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -80,7 +88,7 @@ export default function AdminDashboard({ products, setProducts, onNavigate }) {
       id: '',
       name: '',
       description: '',
-      category: 'printer-toner',
+      category: 'toner',
       price: '',
       stock: ''
     });
@@ -94,7 +102,7 @@ export default function AdminDashboard({ products, setProducts, onNavigate }) {
       name: product.name,
       description: product.description,
       category: product.category,
-      price: product.price,
+      price: product.price ?? '',
       stock: product.stock
     });
     setIsFormOpen(true);
@@ -110,7 +118,8 @@ export default function AdminDashboard({ products, setProducts, onNavigate }) {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const priceNum = parseFloat(formData.price) || 0;
+    const parsedPrice = parseFloat(formData.price);
+    const priceNum = Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : null;
     const stockNum = parseInt(formData.stock) || 0;
 
     if (editingProduct) {
@@ -359,7 +368,7 @@ export default function AdminDashboard({ products, setProducts, onNavigate }) {
                       }}>
                         <div>
                           <p style={{ fontWeight: '700', fontSize: '14.5px', color: '#fff' }}>{p.name}</p>
-                          <p style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Precio: ${p.price.toLocaleString()} COP</p>
+                          <p style={{ fontSize: '12.5px', color: 'var(--text-muted)' }}>Precio: {formatProductPrice(p.price)}</p>
                         </div>
                         <span className="badge" style={{
                           background: p.stock === 0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(245, 158, 11, 0.1)',
@@ -467,20 +476,18 @@ export default function AdminDashboard({ products, setProducts, onNavigate }) {
                         onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                         style={{ background: 'var(--bg-input)' }}
                       >
-                        <option value="printer-toner">Tóner Impresoras</option>
-                        <option value="copier-toner">Tóner Copiadoras</option>
-                        <option value="refill">Recarga de Tóner</option>
-                        <option value="parts">Repuestos y Chips</option>
+                        <option value="toner">Tóner compatible</option>
+                        <option value="ink-cartridge">Cartucho de tinta</option>
+                        <option value="ink-bottle">Botella de recarga</option>
                       </select>
                     </div>
 
                     <div className="grid grid-cols-2" style={{ gap: '16px' }}>
                       <div className="form-group">
-                        <label className="form-label">Precio (COP)</label>
+                        <label className="form-label">Precio (COP, opcional)</label>
                         <input
                           type="number"
                           className="form-input"
-                          required
                           value={formData.price}
                           onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
                           placeholder="Ej. 65000"
@@ -550,11 +557,11 @@ export default function AdminDashboard({ products, setProducts, onNavigate }) {
                           color: '#fff',
                           fontSize: '11px'
                         }}>
-                          {p.category === 'printer-toner' ? 'Tóner Impresora' : p.category === 'copier-toner' ? 'Tóner Copiadora' : p.category === 'refill' ? 'Recarga' : 'Repuesto/Chip'}
+                          {CATEGORY_LABELS[p.category] || p.category}
                         </span>
                       </td>
                       <td style={{ padding: '16px 8px', fontWeight: '600' }}>
-                        ${p.price.toLocaleString()} COP
+                        {formatProductPrice(p.price)}
                       </td>
                       <td style={{ padding: '16px 8px' }}>
                         <span style={{

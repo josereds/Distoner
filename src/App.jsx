@@ -31,7 +31,7 @@ const FacebookIcon = ({ size = 18 }) => (
 );
 
 // Bump when the catalog changes so stale browser data is replaced.
-const PRODUCT_VERSION = 'v7-2026-06-segunda-foto';
+const PRODUCT_VERSION = 'v8-2026-06-fotos-fisicas';
 
 // This inventory contains only the 18 references supplied by the client.
 // Rows 17–21 were absent from the source list; no products are invented to fill that gap.
@@ -72,6 +72,7 @@ const INITIAL_PRODUCTS = [
     reference: 'TK-3162', color: 'Negro', brand: 'Kyocera', category: 'toner',
     description: 'Tóner compatible negro. Referencia suministrada: TK-3162.',
     price: null, stock: 1, image: '/images/products/cliente/tk-3162.jpeg',
+    secondaryImage: '/images/products/tk3162.jpg',
     sourceUrl: 'https://www.inktechnologies.com/kyocera-mita-tk-3162-black-toner-cartridge-genuine-oem'
   },
   {
@@ -79,6 +80,7 @@ const INITIAL_PRODUCTS = [
     reference: 'W1330A · 330A', color: 'Negro', brand: 'HP', category: 'toner',
     description: 'Tóner compatible negro. W1330A corresponde a la denominación comercial HP 330A.',
     price: null, stock: 1, image: '/images/products/cliente/w1330a.jpeg',
+    secondaryImage: '/images/products/fisico/w1330a.jpg',
     sourceUrl: 'https://tonercompatibleperu.com/producto/toner-hp-330a-w1330a-compatible/'
   },
   {
@@ -102,6 +104,7 @@ const INITIAL_PRODUCTS = [
     reference: 'T504 / T544', color: 'Cian', brand: 'Epson compatible', category: 'ink-bottle',
     description: 'Botella de tinta de recarga cian para la familia de referencias T504/T544.',
     price: null, stock: 1, image: '/images/products/cliente/t504-t544.jpeg',
+    secondaryImage: '/images/products/fisico/t504-cyan.jpg',
     sourceUrl: 'https://recargasrafaela.com.ar/producto/global-botella-tinta-para-epson-t504-t544-cian-70ml/'
   },
   {
@@ -109,6 +112,7 @@ const INITIAL_PRODUCTS = [
     reference: '504 / 544 Premium Refill Ink', color: 'Negro', brand: 'Premium Refill Ink', category: 'ink-bottle',
     description: 'Botella de tinta negra de recarga. Referencia suministrada: 504/544 Premium Refill Ink.',
     price: null, stock: 1, image: '/images/products/cliente/t504-t544.jpeg',
+    secondaryImage: '/images/products/fisico/t504-black.jpg',
     sourceUrl: 'https://sumisoft.com.co/producto/tinta-generica-epson-504-544-negro/'
   },
   {
@@ -123,6 +127,7 @@ const INITIAL_PRODUCTS = [
     reference: 'CE505A / CF280A', color: 'Negro', brand: 'HP compatible', category: 'toner',
     description: 'Tóner compatible negro. Referencias suministradas: CE505A y CF280A.',
     price: null, stock: 1, image: '/images/products/cliente/ce505a-cf280a.jpeg',
+    secondaryImage: '/images/products/fisico/ce505a.jpg',
     sourceUrl: 'https://pro-laser.com/en/p/1740-hp-05a-ce505a-cf280a-compatible-toner-black.html'
   },
   {
@@ -130,6 +135,7 @@ const INITIAL_PRODUCTS = [
     reference: 'CE255X · 55X', color: 'Negro', brand: 'HP compatible', category: 'toner',
     description: 'Tóner compatible negro de alta capacidad. Referencia suministrada: CE255X.',
     price: null, stock: 1, image: '/images/products/cliente/ce255x.jpeg',
+    secondaryImage: '/images/products/fisico/ce255x.jpg',
     sourceUrl: 'https://compatiblesperu.com/producto/toner-hp-55x-ce255x/'
   },
   {
@@ -166,6 +172,7 @@ const INITIAL_PRODUCTS = [
     reference: 'SP3710', color: 'Negro', brand: 'Ricoh', category: 'toner',
     description: 'Tóner compatible negro para la familia Ricoh SP3710. Referencia suministrada: SP3710.',
     price: null, stock: 1, image: '/images/products/cliente/sp3710.jpeg',
+    secondaryImage: '/images/products/fisico/sp3710.png',
     sourceUrl: 'https://gruposuministros.co/toner-ricoh/433-toner-sp3710-ricoh-negro-para-impresoras-ricoh-sp3710-m320f-2143657890.html'
   },
   {
@@ -173,6 +180,7 @@ const INITIAL_PRODUCTS = [
     reference: 'Q2612A / FX9 / FX10 / CAN103 / 703 / 104 / 704', color: 'Negro', brand: 'HP / Canon compatible', category: 'toner',
     description: 'Tóner compatible universal negro para las referencias Q2612A, FX9, FX10, CAN103, 703, 104 y 704.',
     price: null, stock: 1, image: '/images/products/cliente/q2612a-universal.jpeg',
+    secondaryImage: '/images/products/fisico/q2612a.jpg',
     sourceUrl: 'https://pro-laser.com/en/p/1014-hp-12a-q2612a-103-303-703-fx9-fx10-104-compatible-toners-black.html'
   },
   {
@@ -187,6 +195,7 @@ const INITIAL_PRODUCTS = [
     reference: 'W1105A · 105A', color: 'Negro', brand: 'HP compatible', category: 'toner',
     description: 'Tóner compatible negro. W1105A corresponde a la denominación comercial HP 105A.',
     price: null, stock: 1, image: '/images/products/cliente/w1105a.jpeg',
+    secondaryImage: '/images/products/fisico/w1105a.jpg',
     sourceUrl: 'https://compatiblesperu.com/producto/toner-compatible-hp-105a-w1105a/'
   },
   {
@@ -194,6 +203,7 @@ const INITIAL_PRODUCTS = [
     reference: 'MLT-D111L · 1.8K', color: 'Negro', brand: 'Samsung', category: 'toner',
     description: 'Tóner compatible negro; rendimiento indicado por el inventario: 1.800 páginas.',
     price: null, stock: 1, image: '/images/products/cliente/mlt-d111l.jpeg',
+    secondaryImage: '/images/products/fisico/mltd111l.jpg',
     sourceUrl: 'https://tonercompatibleperu.com/producto/toner-compatible-samsung-mlt-d111l/'
   },
   {
@@ -201,6 +211,7 @@ const INITIAL_PRODUCTS = [
     reference: 'CB435A / CB436A / CE285A', color: 'Negro', brand: 'HP compatible', category: 'toner',
     description: 'Tóner compatible negro. Referencias suministradas: CB435A, CB436A y CE285A.',
     price: null, stock: 1, image: '/images/products/cliente/cb435-cb436-ce285a.jpeg',
+    secondaryImage: '/images/products/fisico/cb435a.jpg',
     sourceUrl: 'https://todocomputadoras.com.do/product/toner-cb435a-cb436a-ce285a-premium/'
   }
 ];

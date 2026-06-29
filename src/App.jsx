@@ -31,7 +31,7 @@ const FacebookIcon = ({ size = 18 }) => (
 );
 
 // Bump when the catalog changes so stale browser data is replaced.
-const PRODUCT_VERSION = 'v6-2026-06-fotos-cliente';
+const PRODUCT_VERSION = 'v7-2026-06-segunda-foto';
 
 // This inventory contains only the 18 references supplied by the client.
 // Rows 17–21 were absent from the source list; no products are invented to fill that gap.
@@ -41,6 +41,7 @@ const INITIAL_PRODUCTS = [
     reference: 'H-951XL CY', color: 'Cian', brand: 'PrintKing', category: 'ink-cartridge',
     description: 'Cartucho de tinta compatible, alta capacidad XL. Referencia suministrada: H-951XL CY.',
     price: null, stock: 1, image: '/images/products/cliente/h-951xl.jpeg',
+    secondaryImage: '/images/products/h951-cyan.jpg',
     sourceUrl: 'https://www.1ink.com/hp-951xl-ink-cartridge-cyan-cn046an-remanufactured-replacement/'
   },
   {
@@ -48,6 +49,7 @@ const INITIAL_PRODUCTS = [
     reference: 'H-951XL YL', color: 'Amarillo', brand: 'PrintKing', category: 'ink-cartridge',
     description: 'Cartucho de tinta compatible, alta capacidad XL. Referencia suministrada: H-951XL YL.',
     price: null, stock: 1, image: '/images/products/cliente/h-951xl.jpeg',
+    secondaryImage: '/images/products/h951-yellow.jpg',
     sourceUrl: 'https://www.houseofinks.com/hp-951xl-cn048an-high-yield-yellow-ink-cartridge-remanufactured-shows-accurate-ink-levels/'
   },
   {
@@ -55,6 +57,7 @@ const INITIAL_PRODUCTS = [
     reference: 'H-951XL MG', color: 'Magenta', brand: 'PrintKing', category: 'ink-cartridge',
     description: 'Cartucho de tinta compatible, alta capacidad XL. Referencia suministrada: H-951XL MG.',
     price: null, stock: 1, image: '/images/products/cliente/h-951xl.jpeg',
+    secondaryImage: '/images/products/h951-magenta.jpg',
     sourceUrl: 'https://www.1ink.com/hp-951xl-ink-cartridge-magenta-cn047an-remanufactured-replacement/'
   },
   {
@@ -83,6 +86,7 @@ const INITIAL_PRODUCTS = [
     reference: 'T504 / T544', color: 'Amarillo', brand: 'Epson compatible', category: 'ink-bottle',
     description: 'Botella de tinta de recarga amarilla para la familia de referencias T504/T544.',
     price: null, stock: 1, image: '/images/products/cliente/t504-t544.jpeg',
+    secondaryImage: '/images/products/t504-yellow.png',
     sourceUrl: 'https://sskaizen.com/co/producto/botella-tinta-epson-t504-70ml-yellow/'
   },
   {
@@ -90,6 +94,7 @@ const INITIAL_PRODUCTS = [
     reference: 'T504 / T544', color: 'Magenta', brand: 'Epson compatible', category: 'ink-bottle',
     description: 'Botella de tinta de recarga magenta para la familia de referencias T504/T544.',
     price: null, stock: 1, image: '/images/products/cliente/t504-t544.jpeg',
+    secondaryImage: '/images/products/t504-magenta.png',
     sourceUrl: 'https://sskaizen.com/co/producto/botella-tinta-epson-t504-70ml-magenta/'
   },
   {
@@ -132,6 +137,7 @@ const INITIAL_PRODUCTS = [
     reference: 'CC531A / CE411A / CF381A', color: 'Cian', brand: 'HP compatible', category: 'toner',
     description: 'Tóner compatible cian. Se muestran juntas las tres referencias entregadas por el cliente.',
     price: null, stock: 1, image: '/images/products/cliente/cc531a-ce411a-cf381a.jpeg',
+    secondaryImage: '/images/products/cc531a-cyan.jpg',
     sourceUrl: 'https://colombiatoner.com/producto/cartucho-de-toner-color-cian-hp-laserjet-cc531a-304a-ce411a-305a-cf381a-312a-generico/'
   },
   {

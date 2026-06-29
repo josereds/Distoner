@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
@@ -30,7 +30,19 @@ export default function ProductDetailModal({
   const modalRef = useRef(null);
   const modalBodyRef = useRef(null);
 
-  // Scroll to top when product changes (e.g. clicking a related product)
+  // Photo 1 = caja enviada por el cliente; photo 2 (si existe) = producto físico.
+  const gallery = [product.image, product.secondaryImage].filter(Boolean);
+  const [activeImage, setActiveImage] = useState(0);
+
+  // Reset gallery to the first image when the product changes (e.g. clicking a related
+  // product) without an effect — React's recommended "adjust state during render" pattern.
+  const [lastProductId, setLastProductId] = useState(product.id);
+  if (product.id !== lastProductId) {
+    setLastProductId(product.id);
+    setActiveImage(0);
+  }
+
+  // Scroll to top when product changes
   useEffect(() => {
     if (modalRef.current) modalRef.current.scrollTop = 0;
     if (modalBodyRef.current) modalBodyRef.current.scrollTop = 0;
@@ -106,11 +118,50 @@ export default function ProductDetailModal({
           <div className="product-modal-layout">
             <div className="product-modal-media">
               <img
-                src={product.image}
+                src={gallery[activeImage] || product.image}
                 alt={`${product.name}, referencia ${product.reference}`}
                 width="720"
                 height="720"
               />
+              {gallery.length > 1 && (
+                <div
+                  role="group"
+                  aria-label="Imágenes del producto"
+                  style={{ display: 'flex', gap: '10px', marginTop: '12px', flexWrap: 'wrap' }}
+                >
+                  {gallery.map((src, index) => (
+                    <button
+                      key={src}
+                      type="button"
+                      onClick={() => setActiveImage(index)}
+                      aria-pressed={index === activeImage}
+                      aria-label={index === 0 ? 'Ver la caja' : 'Ver el producto físico'}
+                      style={{
+                        padding: 0,
+                        width: '66px',
+                        height: '66px',
+                        flexShrink: 0,
+                        cursor: 'pointer',
+                        borderRadius: '10px',
+                        overflow: 'hidden',
+                        background: '#fff',
+                        border: index === activeImage ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                        opacity: index === activeImage ? 1 : 0.7,
+                        transition: 'var(--transition)'
+                      }}
+                    >
+                      <img
+                        src={src}
+                        alt=""
+                        width="64"
+                        height="64"
+                        loading="lazy"
+                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
               <span>Imagen de referencia; la presentación puede variar.</span>
             </div>
 

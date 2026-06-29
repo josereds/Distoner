@@ -1,16 +1,56 @@
-# React + Vite
+# Distoner — Sitio web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Landing de una sola página para **Distoner Suministros**: recarga de tóner, venta de
+suministros (cartuchos, tóner, botellas de tinta) y mantenimiento de impresoras en
+Bogotá. El contacto y las cotizaciones se canalizan por WhatsApp.
 
-Currently, two official plugins are available:
+## Tecnología
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + **Vite** (JavaScript, sin TypeScript salvo un componente UI)
+- **lucide-react** para iconos
+- Estilos en CSS plano (`src/index.css`, `src/App.css`) + estilos inline
+- **Sin backend**: el catálogo se guarda en `localStorage` del navegador. No requiere
+  base de datos ni variables de entorno (`.env`).
 
-## React Compiler
+## Requisitos
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 18+ (recomendado LTS)
 
-## Expanding the ESLint configuration
+## Comandos
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install      # instalar dependencias
+npm run dev      # servidor de desarrollo (http://localhost:5173)
+npm run build    # build de producción -> dist/
+npm run preview  # previsualizar el build
+npm run lint     # ESLint
+```
+
+## Estructura
+
+```
+public/
+  images/products/   # 23 imágenes del catálogo
+  hero_video.mp4     # video de fondo del hero
+  og-image-v3.jpg    # imagen para compartir en redes
+src/
+  App.jsx            # layout, catálogo inicial (INITIAL_PRODUCTS) y enrutado por hash
+  components/        # Hero, Products, Services, Contact, FAQ, AdminDashboard, etc.
+```
+
+## Panel de administración
+
+Hay un panel oculto para editar el catálogo. Se accede añadiendo `#admin` a la URL
+(o con el enlace «Admin» en el pie de página). Los cambios se guardan en el navegador
+del dispositivo, no en un servidor.
+
+## Catálogo
+
+El catálogo inicial vive en `INITIAL_PRODUCTS` dentro de [src/App.jsx](src/App.jsx).
+Al cambiarlo, sube la constante `PRODUCT_VERSION` para que los navegadores reemplacen
+los datos guardados en caché.
+
+## Despliegue
+
+Proyecto Vite estático: se despliega en Vercel importando el repositorio (framework
+detectado automáticamente como Vite). No hay variables de entorno que configurar.

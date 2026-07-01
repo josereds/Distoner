@@ -4,6 +4,14 @@ import { Phone, ArrowRight, CheckCircle, MapPin, Shield, Sparkles } from 'lucide
 export default function Hero({ onNavigate }) {
   const heroRef = useRef(null);
 
+  // Azul de marca reutilizado en "DISTONER" y "Mantenimiento Técnico"
+  const blueGradient = {
+    background: 'linear-gradient(135deg, #60a5fa 0%, #22d3ee 50%, #0ea5e9 100%)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text'
+  };
+
   // Subtle parallax on mouse move for premium feel
   useEffect(() => {
     const handler = (e) => {
@@ -130,12 +138,19 @@ export default function Hero({ onNavigate }) {
           letterSpacing: '-0.04em',
           color: 'white'
         }}>
-          Recargas, Suministros y<br />
           <span style={{
-            background: 'linear-gradient(135deg, #60a5fa 0%, #22d3ee 50%, #0ea5e9 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
+            ...blueGradient,
+            display: 'block',
+            fontSize: '1.4em',
+            fontWeight: '900',
+            lineHeight: '1',
+            letterSpacing: '0.01em',
+            marginBottom: '12px',
+            filter: 'drop-shadow(0 0 40px rgba(37, 99, 235, 0.45))'
+          }}>DISTONER</span>
+          Recargas, Suministros{' '}y<br />
+          <span style={{
+            ...blueGradient,
             filter: 'drop-shadow(0 0 30px rgba(37, 99, 235, 0.35))'
           }}>Mantenimiento Técnico</span>
         </h1>

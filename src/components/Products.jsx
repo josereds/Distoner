@@ -327,6 +327,13 @@ export default function Products({ products = [] }) {
                         </div>
                         <h3>{product.name}</h3>
                         <p className="market-reference" translate="no">{product.reference}</p>
+                        <p style={{
+                          fontSize: '10.5px',
+                          color: 'var(--text-muted)',
+                          opacity: 0.7,
+                          fontStyle: 'italic',
+                          margin: '4px 0 0'
+                        }}>* Imagen meramente ilustrativa</p>
                         <span className="market-view-link">Ver producto <ArrowRight size={15} aria-hidden="true" /></span>
                       </div>
                     </button>

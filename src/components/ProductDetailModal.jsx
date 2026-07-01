@@ -162,7 +162,7 @@ export default function ProductDetailModal({
                   ))}
                 </div>
               )}
-              <span>Imagen de referencia; la presentación puede variar.</span>
+              <span>Las imágenes son meramente ilustrativas; la presentación puede variar.</span>
             </div>
 
             <div className="product-modal-content">
